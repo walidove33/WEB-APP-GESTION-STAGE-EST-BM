@@ -1,6 +1,7 @@
 /* ESTBM Professional Design System - Ultra Modern */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+/* ===== ENHANCED DESIGN TOKENS ===== */
 :root {
   /* Professional Color Palette */
   --primary-50: #eff6ff;
@@ -14,6 +15,7 @@
   --primary-800: #1e40af;
   --primary-900: #1e3a8a;
 
+  /* Enhanced Secondary Colors */
   --secondary-50: #faf5ff;
   --secondary-100: #f3e8ff;
   --secondary-200: #e9d5ff;
@@ -25,6 +27,7 @@
   --secondary-800: #6b21a8;
   --secondary-900: #581c87;
 
+  /* Modern Accent Colors */
   --accent-50: #fdf2f8;
   --accent-100: #fce7f3;
   --accent-200: #fbcfe8;
@@ -35,6 +38,8 @@
   --accent-700: #be185d;
   --accent-800: #9d174d;
   --accent-900: #831843;
+  
+  /* Enhanced Success Colors */
   --success-50: #ecfdf5;
   --success-100: #d1fae5;
   --success-200: #a7f3d0;
@@ -46,6 +51,7 @@
   --success-800: #065f46;
   --success-900: #064e3b;
 
+  /* Professional Warning Colors */
   --warning-50: #fffbeb;
   --warning-100: #fef3c7;
   --warning-200: #fde68a;
@@ -57,6 +63,7 @@
   --warning-800: #92400e;
   --warning-900: #78350f;
 
+  /* Modern Error Colors */
   --error-50: #fef2f2;
   --error-100: #fee2e2;
   --error-200: #fecaca;
@@ -68,6 +75,7 @@
   --error-800: #991b1b;
   --error-900: #7f1d1d;
 
+  /* Enhanced Neutral Palette */
   --neutral-50: #f8fafc;
   --neutral-100: #f1f5f9;
   --neutral-200: #e2e8f0;
@@ -79,6 +87,7 @@
   --neutral-800: #1e293b;
   --neutral-900: #0f172a;
 
+  /* Professional Typography Scale */
   /* Typography Scale */
   --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
@@ -94,6 +103,7 @@
   --text-5xl: 3rem;        /* 48px */
   --text-6xl: 3.75rem;     /* 60px */
 
+  /* Enhanced Spacing System */
   /* Spacing Scale (8px base) */
   --space-0: 0;
   --space-1: 0.25rem;      /* 4px */
@@ -110,6 +120,7 @@
   --space-24: 6rem;        /* 96px */
   --space-32: 8rem;        /* 128px */
 
+  /* Modern Border Radius */
   /* Border Radius */
   --radius-none: 0;
   --radius-sm: 0.375rem;   /* 6px */
@@ -120,6 +131,7 @@
   --radius-3xl: 2rem;      /* 32px */
   --radius-full: 9999px;
 
+  /* Professional Shadow System */
   /* Shadows */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -129,6 +141,7 @@
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
 
+  /* Enhanced Transition System */
   /* Transitions */
   --transition-none: none;
   --transition-all: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -137,6 +150,7 @@
   --transition-slow: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: all 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
+  /* Professional Z-Index Scale */
   /* Z-Index Scale */
   --z-0: 0;
   --z-10: 10;
@@ -153,6 +167,7 @@
   --z-tooltip: 1070;
   --z-toast: 1080;
 
+  /* Animation Duration System */
   /* Animation Durations */
   --duration-75: 75ms;
   --duration-100: 100ms;
@@ -163,14 +178,32 @@
   --duration-700: 700ms;
   --duration-1000: 1000ms;
 
+  /* Responsive Breakpoints */
   /* Breakpoints */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+  
+  /* Glass Morphism Variables */
+  --glass-bg-light: rgba(255, 255, 255, 0.95);
+  --glass-bg-medium: rgba(255, 255, 255, 0.85);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.98);
+  --glass-border-light: rgba(255, 255, 255, 0.2);
+  --glass-border-medium: rgba(255, 255, 255, 0.3);
+  --glass-blur-light: 10px;
+  --glass-blur-medium: 20px;
+  --glass-blur-heavy: 30px;
+  
+  /* Micro-interaction Variables */
+  --hover-lift: translateY(-4px) scale(1.02);
+  --hover-lift-sm: translateY(-2px) scale(1.01);
+  --hover-lift-lg: translateY(-8px) scale(1.03);
+  --active-press: translateY(0) scale(0.98);
 }
 
+/* ===== ENHANCED GLOBAL RESET ===== */
 /* Global Reset & Base Styles */
 *,
 *::before,
@@ -180,6 +213,7 @@
   padding: 0;
 }
 
+/* Enhanced HTML Base */
 html {
   font-size: 16px;
   line-height: 1.5;
@@ -187,8 +221,10 @@ html {
   -moz-tab-size: 4;
   tab-size: 4;
   scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed navbar */
 }
 
+/* Professional Body Styling */
 body {
   font-family: var(--font-family-primary);
   font-weight: 400;
@@ -205,8 +241,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
 }
 
+/* ===== ENHANCED SCROLLBAR ===== */
 /* Enhanced Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -228,12 +267,15 @@ body {
   background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
 }
 
+/* ===== PROFESSIONAL SELECTION ===== */
 /* Selection Styles */
 ::selection {
   background: var(--primary-200);
   color: var(--primary-900);
+  text-shadow: none;
 }
 
+/* ===== ENHANCED TYPOGRAPHY ===== */
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-primary);
@@ -242,6 +284,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--neutral-900);
   margin-bottom: var(--space-4);
   letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 h1 { 
@@ -270,12 +313,16 @@ h6 {
   font-weight: 600; 
 }
 
+/* Enhanced Paragraph Styling */
 p {
   margin-bottom: var(--space-4);
   color: var(--neutral-700);
   line-height: 1.7;
+  text-wrap: pretty;
+  max-width: 65ch;
 }
 
+/* ===== ULTRA MODERN BUTTON SYSTEM ===== */
 /* Professional Button System */
 .btn {
   display: inline-flex;
@@ -299,6 +346,7 @@ p {
   position: relative;
   overflow: hidden;
   min-height: 44px;
+  font-feature-settings: "tnum" 1;
   
   /* Shimmer effect */
   &::before {
@@ -315,30 +363,39 @@ p {
     transition: left var(--transition-slow);
   }
 
+  /* Enhanced Hover Effect */
   &:hover::before {
     left: 100%;
   }
 
+  /* Professional Focus States */
   &:focus {
     outline: 2px solid var(--primary-500);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   }
 
+  /* Enhanced Disabled State */
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none !important;
+    filter: grayscale(0.5);
   }
 
+  /* Professional Hover Animation */
   &:hover:not(:disabled) {
     transform: translateY(-2px) scale(1.02);
     box-shadow: var(--shadow-xl);
   }
 
+  /* Enhanced Active State */
   &:active:not(:disabled) {
     transform: translateY(0) scale(0.98);
+    transition: transform 0.1s ease;
   }
 
+  /* Professional Size Variants */
   /* Size variants */
   &.btn-xs {
     padding: var(--space-1) var(--space-3);
@@ -364,6 +421,7 @@ p {
     min-height: 60px;
   }
 
+  /* Enhanced Color Variants with Better Gradients */
   /* Color variants */
   &.btn-primary {
     background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
@@ -430,6 +488,7 @@ p {
     }
   }
 
+  /* Professional Outline Variants */
   /* Outline variants */
   &.btn-outline-primary {
     background: rgba(255, 255, 255, 0.9);
@@ -483,6 +542,7 @@ p {
     }
   }
 
+  /* Modern Ghost Variants */
   /* Ghost variants */
   &.btn-ghost {
     background: transparent;
@@ -495,9 +555,11 @@ p {
     }
   }
 
+  /* Enhanced Loading State */
   /* Loading state */
   &.btn-loading {
     pointer-events: none;
+    position: relative;
     
     .btn-spinner {
       width: 16px;
@@ -507,14 +569,26 @@ p {
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: inherit;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
   }
 }
 
+/* ===== ULTRA MODERN FORM SYSTEM ===== */
 /* Professional Form System */
 .form-group {
   margin-bottom: var(--space-6);
+  position: relative;
 }
 
+/* Enhanced Form Labels */
 .form-label {
   display: block;
   margin-bottom: var(--space-2);
@@ -522,8 +596,16 @@ p {
   font-weight: 600;
   color: var(--neutral-700);
   letter-spacing: 0.025em;
+  transition: color var(--transition-fast);
+  
+  &.required::after {
+    content: ' *';
+    color: var(--error-500);
+    font-weight: 700;
+  }
 }
 
+/* Professional Form Controls */
 .form-control,
 .form-select {
   display: block;
@@ -540,12 +622,15 @@ p {
   border-radius: var(--radius-xl);
   transition: var(--transition-bounce);
   min-height: 44px;
+  font-feature-settings: "tnum" 1;
 
   &::placeholder {
     color: var(--neutral-400);
     opacity: 1;
+    font-style: italic;
   }
 
+  /* Enhanced Focus State */
   &:focus {
     outline: none;
     border-color: var(--primary-500);
@@ -554,26 +639,40 @@ p {
     transform: translateY(-1px);
   }
 
+  /* Professional Invalid State */
   &.is-invalid {
     border-color: var(--error-500);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    animation: shake 0.3s ease-in-out;
   }
 
+  /* Enhanced Disabled State */
   &:disabled {
     background: var(--neutral-100);
     color: var(--neutral-500);
     cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 
+/* Professional Invalid Feedback */
 .invalid-feedback {
   display: block;
   margin-top: var(--space-1);
   font-size: var(--text-sm);
   color: var(--error-600);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  
+  &::before {
+    content: '⚠️';
+    font-size: 0.875rem;
+  }
 }
 
+/* ===== ULTRA MODERN CARD SYSTEM ===== */
 /* Professional Card System */
 .card {
   background: rgba(255, 255, 255, 0.95);
@@ -584,7 +683,10 @@ p {
   overflow: hidden;
   transition: var(--transition-bounce);
   position: relative;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 
+  /* Enhanced Glass Effect */
   &::before {
     content: '';
     position: absolute;
@@ -598,12 +700,14 @@ p {
       transparent);
   }
 
+  /* Professional Hover Effect */
   &:hover {
     transform: translateY(-4px) scale(1.01);
     box-shadow: var(--shadow-2xl);
     border-color: rgba(59, 130, 246, 0.2);
   }
 
+  /* Enhanced Card Header */
   .card-header {
     padding: var(--space-8);
     border-bottom: 1px solid var(--neutral-200);
@@ -614,26 +718,49 @@ p {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: var(--space-8);
+      right: var(--space-8);
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        var(--primary-300), 
+        transparent);
+    }
 
     h3 {
       margin: 0;
       font-size: var(--text-xl);
       font-weight: 700;
       color: var(--neutral-900);
+      background: linear-gradient(135deg, var(--neutral-900), var(--primary-600));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
   }
 
+  /* Enhanced Card Body */
   .card-body {
     padding: var(--space-8);
+    position: relative;
   }
 
+  /* Professional Card Footer */
   .card-footer {
     padding: var(--space-6) var(--space-8);
     border-top: 1px solid var(--neutral-200);
     background: var(--neutral-50);
+    backdrop-filter: blur(10px);
   }
 }
 
+/* ===== ENHANCED BADGE SYSTEM ===== */
 /* Professional Badge System */
 .badge {
   display: inline-flex;
@@ -650,11 +777,35 @@ p {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
 
+  /* Micro-interaction */
   &:hover {
     transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Shimmer effect for badges */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.3), 
+      transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
   }
 
+  /* Enhanced Badge Variants */
   &.badge-primary {
     background: linear-gradient(135deg, var(--primary-500), var(--primary-400));
     color: white;
@@ -709,6 +860,7 @@ p {
     color: white;
     box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
   }
+  
   /* Outline badges */
   &.badge-outline-primary {
     background: rgba(59, 130, 246, 0.1);
@@ -735,6 +887,7 @@ p {
   }
 }
 
+/* ===== ENHANCED ALERT SYSTEM ===== */
 /* Professional Alert System */
 .alert {
   position: relative;
@@ -748,34 +901,41 @@ p {
   font-weight: 500;
   backdrop-filter: blur(10px);
   animation: slideInDown var(--duration-300) ease-out;
+  border-left: 4px solid transparent;
 
+  /* Enhanced Alert Variants */
   &.alert-primary {
     background: rgba(59, 130, 246, 0.1);
     border-color: var(--primary-300);
+    border-left-color: var(--primary-500);
     color: var(--primary-800);
   }
 
   &.alert-success {
     background: rgba(16, 185, 129, 0.1);
     border-color: var(--success-300);
+    border-left-color: var(--success-500);
     color: var(--success-800);
   }
 
   &.alert-warning {
     background: rgba(245, 158, 11, 0.1);
     border-color: var(--warning-300);
+    border-left-color: var(--warning-500);
     color: var(--warning-800);
   }
 
   &.alert-danger {
     background: rgba(239, 68, 68, 0.1);
     border-color: var(--error-300);
+    border-left-color: var(--error-500);
     color: var(--error-800);
   }
 
   &.alert-info {
     background: rgba(59, 130, 246, 0.1);
     border-color: var(--primary-300);
+    border-left-color: var(--primary-500);
     color: var(--primary-800);
   }
 }

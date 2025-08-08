@@ -175,29 +175,42 @@ export class PlanificationManagementComponent implements OnInit, OnDestroy {
     }
 
     this.creating = true;
+    
+    // Debug: Log the exact payload being sent
+    console.log('📤 Payload being sent to backend:', this.newPlanification);
+    
     this.stageService.createPlanification(this.newPlanification)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: planif => {
+          console.log('✅ Planification created successfully:', planif);
           this.creating = false;
           this.notificationService.success(
             'Succès',
             `Planification créée pour le ${planif.dateSoutenance}`
           );
-          // Reset form et payload
-          this.planifForm.resetForm();
-          this.newPlanification = {
-            dateSoutenance: '',
-            encadrant:    { id: 0 },
-            departement:  { id: 0 },
-            classeGroupe: { id: 0 },
-            anneeScolaire:{ id: 0 }
-          };
+          // Reset form and reload data
+          this.resetForm();
+          this.loadPlanifications();
           this.cdr.detectChanges();
         },
         error: err => {
+          console.error('❌ Error creating planification:', err);
           this.creating = false;
-          console.error('Erreur création planification:', err);
+          
+          // Enhanced error handling
+          let errorMessage = 'Impossible de créer la planification';
+          if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else if (err.status === 400) {
+            errorMessage = 'Données invalides. Vérifiez tous les champs.';
+          } else if (err.status === 401) {
+            errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+          } else if (err.status === 403) {
+            errorMessage = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+          }
+          
+          this.notificationService.error('Erreur de création', errorMessage);
           this.cdr.detectChanges();
         }
       });
@@ -213,7 +226,13 @@ export class PlanificationManagementComponent implements OnInit, OnDestroy {
       classeGroupe: { id: 0 },
       anneeScolaire: { id: 0 }
     };
-    this.planifForm.resetForm();
+    
+    // Reset form if it exists
+    if (this.planifForm) {
+      this.planifForm.resetForm();
+    }
+    
+    this.notificationService.info('Formulaire', 'Formulaire réinitialisé');
   }
 
 

@@ -1,16 +1,17 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subject, takeUntil, filter } from 'rxjs';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  styleUrls: ['./navbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule],
   standalone: true,
@@ -18,11 +19,11 @@ import { User } from '../../../models/user.model';
     // Mobile menu animations
     trigger('slideInOut', [
       state('closed', style({
-        transform: 'translateX(-100%)',
+        transform: 'translateY(-20px)',
         opacity: 0
       })),
       state('open', style({
-        transform: 'translateX(0)',
+        transform: 'translateY(0)',
         opacity: 1
       })),
       transition('closed <=> open', [
@@ -34,14 +35,14 @@ import { User } from '../../../models/user.model';
     trigger('fadeInOut', [
       state('void', style({
         opacity: 0,
-        transform: 'translateY(-10px) scale(0.95)'
+        transform: 'translateY(-15px) scale(0.95)'
       })),
       state('*', style({
         opacity: 1,
         transform: 'translateY(0) scale(1)'
       })),
       transition('void <=> *', [
-        animate('0.2s cubic-bezier(0.4, 0, 0.2, 1)')
+        animate('0.3s cubic-bezier(0.4, 0, 0.2, 1)')
       ])
     ]),
     
@@ -65,31 +66,16 @@ import { User } from '../../../models/user.model';
       ])
     ]),
     
-    // Active link indicator
-    trigger('activeLink', [
-      state('inactive', style({
-        transform: 'scaleX(0)',
-        opacity: 0
-      })),
-      state('active', style({
-        transform: 'scaleX(1)',
-        opacity: 1
-      })),
-      transition('inactive <=> active', [
-        animate('0.3s cubic-bezier(0.4, 0, 0.2, 1)')
-      ])
-    ]),
-    
     // Brand logo hover animation
     trigger('logoHover', [
       state('normal', style({
         transform: 'scale(1) rotate(0deg)'
       })),
       state('hovered', style({
-        transform: 'scale(1.1) rotate(5deg)'
+        transform: 'scale(1.08) rotate(3deg)'
       })),
       transition('normal <=> hovered', [
-        animate('0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)')
+        animate('0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)')
       ])
     ])
   ]
@@ -105,6 +91,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userMenuOpen = false;
   isLoading = false;
   logoHoverState = 'normal';
+  hasLogo = false;
   
   // Animation states
   mobileMenuState = 'closed';
@@ -113,15 +100,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   constructor(
     public router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to current user
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-      this.currentUser = user;
-    });
+        this.currentUser = user;
+        this.cdr.markForCheck();
+      });
 
     // Track route changes for active link highlighting
     this.router.events
@@ -131,23 +122,42 @@ export class NavbarComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.updateActiveLink();
+        this.closeMenus(); // Close mobile menu on navigation
       });
+
+    // Check if logo exists
+    this.checkLogoExists();
+
+    // Welcome message for navbar
+    if (this.currentUser) {
+      this.notificationService.info(
+        'Navigation',
+        `Interface chargée pour ${this.currentUser.prenom} ${this.currentUser.nom}`
+      );
+    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    this.isScrolled = window.scrollY > 10;
+    const scrolled = window.scrollY > 20;
+    if (this.isScrolled !== scrolled) {
+      this.isScrolled = scrolled;
+      this.cdr.markForCheck();
+    }
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
-    if (!this.navbar.nativeElement.contains(target)) {
+    if (this.navbar && !this.navbar.nativeElement.contains(target)) {
       this.closeMenus();
     }
   }
@@ -159,9 +169,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.closeMenus();
     }
     
-    // Handle arrow keys for navigation
+    // Handle arrow keys for dropdown navigation
     if (this.userMenuOpen) {
       this.handleKeyboardNavigation(event);
+    }
+    
+    // Quick navigation shortcuts
+    if (event.ctrlKey || event.metaKey) {
+      switch (event.key) {
+        case 'h':
+          event.preventDefault();
+          this.router.navigate([this.getDashboardRoute()]);
+          this.notificationService.info('Navigation', 'Retour au tableau de bord');
+          break;
+        case 'n':
+          event.preventDefault();
+          if (this.currentUser?.role === 'ETUDIANT') {
+            this.router.navigate(['/student/new-stage']);
+            this.notificationService.info('Navigation', 'Nouvelle demande de stage');
+          }
+          break;
+      }
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    // Close mobile menu on resize to desktop
+    if (window.innerWidth > 900 && this.mobileMenuOpen) {
+      this.closeMobileMenu();
     }
   }
 
@@ -172,33 +208,70 @@ export class NavbarComponent implements OnInit, OnDestroy {
     
     // Prevent body scroll when mobile menu is open
     document.body.style.overflow = this.mobileMenuOpen ? 'hidden' : '';
+    
+    // Notification for accessibility
+    this.notificationService.info(
+      'Menu mobile',
+      this.mobileMenuOpen ? 'Menu ouvert' : 'Menu fermé'
+    );
+    
+    this.cdr.markForCheck();
   }
 
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
     this.userDropdownState = this.userMenuOpen ? '*' : 'void';
+    
+    // Close mobile menu if open
+    if (this.mobileMenuOpen) {
+      this.closeMobileMenu();
+    }
+    
+    this.notificationService.info(
+      'Menu utilisateur',
+      this.userMenuOpen ? 'Profil ouvert' : 'Profil fermé'
+    );
+    
+    this.cdr.markForCheck();
   }
 
   closeMenus(): void {
+    const wasOpen = this.mobileMenuOpen || this.userMenuOpen;
+    
     this.mobileMenuOpen = false;
     this.userMenuOpen = false;
     this.mobileMenuState = 'closed';
     this.userDropdownState = 'void';
     this.hamburgerState = 'closed';
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+    
+    if (wasOpen) {
+      this.notificationService.info('Navigation', 'Menus fermés');
+    }
+    
+    this.cdr.markForCheck();
   }
 
   closeMobileMenu(): void {
-    this.mobileMenuOpen = false;
-    this.mobileMenuState = 'closed';
-    this.hamburgerState = 'closed';
+    if (this.mobileMenuOpen) {
+      this.mobileMenuOpen = false;
+      this.mobileMenuState = 'closed';
+      this.hamburgerState = 'closed';
+      document.body.style.overflow = '';
+      this.cdr.markForCheck();
+    }
   }
 
   onLogoHover(): void {
     this.logoHoverState = 'hovered';
+    this.cdr.markForCheck();
   }
 
   onLogoLeave(): void {
     this.logoHoverState = 'normal';
+    this.cdr.markForCheck();
   }
 
   private handleKeyboardNavigation(event: KeyboardEvent): void {
@@ -229,7 +302,43 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private updateActiveLink(): void {
     // Update active link indicator based on current route
     const currentRoute = this.router.url;
-    // Implementation for active link highlighting
+    
+    // Add visual feedback for route changes
+    this.notificationService.info(
+      'Navigation',
+      `Page active: ${this.getPageTitle(currentRoute)}`
+    );
+  }
+
+  private getPageTitle(route: string): string {
+    const routeTitles: { [key: string]: string } = {
+      '/student/dashboard': 'Tableau de bord étudiant',
+      '/student/stages': 'Mes stages',
+      '/student/new-stage': 'Nouvelle demande',
+      '/student/soutenances': 'Mes soutenances',
+      '/encadrant/dashboard': 'Tableau de bord encadrant',
+      '/encadrant/rapports': 'Gestion des rapports',
+      '/encadrant/planifications': 'Mes planifications',
+      '/admin/dashboard': 'Tableau de bord admin',
+      '/admin/encadrants': 'Gestion encadrants',
+      '/admin/admins': 'Gestion administrateurs',
+      '/admin/planifications': 'Gestion planifications'
+    };
+    
+    return routeTitles[route] || 'Page inconnue';
+  }
+
+  private checkLogoExists(): void {
+    const img = new Image();
+    img.onload = () => {
+      this.hasLogo = true;
+      this.cdr.markForCheck();
+    };
+    img.onerror = () => {
+      this.hasLogo = false;
+      this.cdr.markForCheck();
+    };
+    img.src = '/assets/logo.png';
   }
 
   getDashboardRoute(): string {
@@ -249,51 +358,247 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   getInitials(user: User | null): string {
     if (!user) return '?';
-    return `${user.prenom?.charAt(0) || ''}${user.nom?.charAt(0) || ''}`.toUpperCase();
+    const firstInitial = user.prenom?.charAt(0) || '';
+    const lastInitial = user.nom?.charAt(0) || '';
+    return `${firstInitial}${lastInitial}`.toUpperCase();
   }
 
   getFullName(user: User | null): string {
     if (!user) return 'Utilisateur';
-    return `${user.prenom} ${user.nom}`;
+    return `${user.prenom || ''} ${user.nom || ''}`.trim();
   }
 
   getRoleLabel(role: string | undefined): string {
-    switch (role) {
-      case 'ETUDIANT':
-        return 'Étudiant';
-      case 'ENCADRANT':
-        return 'Encadrant';
-      case 'ADMIN':
-        return 'Administrateur';
-      default:
-        return 'Utilisateur';
-    }
+    const roleLabels: { [key: string]: string } = {
+      'ETUDIANT': 'Étudiant',
+      'ENCADRANT': 'Encadrant',
+      'ADMIN': 'Administrateur'
+    };
+    return roleLabels[role || ''] || 'Utilisateur';
   }
 
   getRoleBadgeColor(role: string | undefined): string {
-    switch (role) {
-      case 'ETUDIANT':
-        return 'student';
-      case 'ENCADRANT':
-        return 'encadrant';
-      case 'ADMIN':
-        return 'admin';
-      default:
-        return 'default';
-    }
+    const roleColors: { [key: string]: string } = {
+      'ETUDIANT': 'primary',
+      'ENCADRANT': 'success',
+      'ADMIN': 'warning'
+    };
+    return roleColors[role || ''] || 'secondary';
   }
 
   async logout(event: Event): Promise<void> {
     event.preventDefault();
-    this.isLoading = true;
     
-    try {
-      await this.authService.logout();
-      this.router.navigate(['/login']);
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      this.isLoading = false;
+    if (this.isLoading) return;
+    
+    this.isLoading = true;
+    this.cdr.markForCheck();
+    
+    // Show confirmation with enhanced UX
+    this.notificationService.warning(
+      'Confirmer la déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      0,
+      [
+        {
+          label: 'Annuler',
+          style: 'secondary',
+          action: () => {
+            this.isLoading = false;
+            this.cdr.markForCheck();
+            this.notificationService.info('Déconnexion', 'Déconnexion annulée');
+          }
+        },
+        {
+          label: 'Se déconnecter',
+          style: 'danger',
+          action: async () => {
+            try {
+              // Add visual feedback
+              const navbar = document.querySelector('.estbm-navbar');
+              if (navbar) {
+                navbar.classList.add('navbar-loading');
+              }
+              
+              await this.authService.logout();
+              
+              // Success animation
+              if (navbar) {
+                navbar.classList.remove('navbar-loading');
+                navbar.classList.add('navbar-success');
+              }
+              
+              // Navigate after animation
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 500);
+              
+            } catch (error) {
+              console.error('Logout error:', error);
+              this.notificationService.error(
+                'Erreur de déconnexion',
+                'Une erreur est survenue lors de la déconnexion'
+              );
+              
+              // Error animation
+              const navbar = document.querySelector('.estbm-navbar');
+              if (navbar) {
+                navbar.classList.remove('navbar-loading');
+                navbar.classList.add('navbar-error');
+                setTimeout(() => {
+                  navbar.classList.remove('navbar-error');
+                }, 1000);
+              }
+            } finally {
+              this.isLoading = false;
+              this.cdr.markForCheck();
+            }
+          }
+        }
+      ]
+    );
+  }
+
+  // ==================== NAVIGATION HELPERS ====================
+
+  navigateToProfile(): void {
+    this.notificationService.info('Profil', 'Redirection vers votre profil...');
+    // TODO: Implement profile navigation
+    this.closeMenus();
+  }
+
+  navigateToSettings(): void {
+    this.notificationService.info('Paramètres', 'Ouverture des paramètres...');
+    // TODO: Implement settings navigation
+    this.closeMenus();
+  }
+
+  navigateToNotifications(): void {
+    this.notificationService.info('Notifications', 'Centre de notifications...');
+    // TODO: Implement notifications center
+    this.closeMenus();
+  }
+
+  navigateToHelp(): void {
+    this.notificationService.info('Aide', 'Ouverture de l\'aide et support...');
+    // TODO: Implement help navigation
+    this.closeMenus();
+  }
+
+  // ==================== ACCESSIBILITY HELPERS ====================
+
+  announceNavigation(destination: string): void {
+    this.notificationService.info('Navigation', `Navigation vers ${destination}`);
+  }
+
+  announceUserAction(action: string): void {
+    this.notificationService.info('Action utilisateur', action);
+  }
+
+  // ==================== PERFORMANCE HELPERS ====================
+
+  trackByRole(index: number, item: any): string {
+    return item.role || index;
+  }
+
+  preloadRoute(route: string): void {
+    // Preload route for better performance
+    this.router.navigate([route]);
+  }
+
+  // ==================== THEME HELPERS ====================
+
+  toggleTheme(): void {
+    // TODO: Implement theme switching
+    this.notificationService.info('Thème', 'Basculement de thème (à implémenter)');
+  }
+
+  // ==================== SEARCH HELPERS ====================
+
+  onSearchFocus(): void {
+    this.notificationService.info('Recherche', 'Recherche globale activée');
+  }
+
+  onSearchSubmit(query: string): void {
+    if (query.trim()) {
+      this.notificationService.info('Recherche', `Recherche pour: "${query}"`);
+      // TODO: Implement global search
     }
+  }
+
+  // ==================== NOTIFICATION HELPERS ====================
+
+  getNotificationCount(): number {
+    // TODO: Implement notification count
+    return 0;
+  }
+
+  hasUnreadNotifications(): boolean {
+    // TODO: Implement unread notifications check
+    return false;
+  }
+
+  // ==================== MOBILE SPECIFIC HELPERS ====================
+
+  onMobileNavItemClick(item: string): void {
+    this.notificationService.info('Navigation mobile', `Sélection: ${item}`);
+    this.closeMobileMenu();
+  }
+
+  // ==================== ANIMATION CALLBACKS ====================
+
+  onMenuAnimationDone(event: any): void {
+    if (event.toState === 'closed') {
+      document.body.style.overflow = '';
+    }
+  }
+
+  onDropdownAnimationDone(event: any): void {
+    // Handle dropdown animation completion
+    if (event.toState === 'void') {
+      this.cdr.markForCheck();
+    }
+  }
+
+  // ==================== ERROR HANDLING ====================
+
+  onNavigationError(error: any): void {
+    console.error('Navigation error:', error);
+    this.notificationService.error(
+      'Erreur de navigation',
+      'Impossible de naviguer vers cette page'
+    );
+  }
+
+  // ==================== UTILITY METHODS ====================
+
+  isCurrentRoute(route: string): boolean {
+    return this.router.url === route;
+  }
+
+  isRouteActive(route: string): boolean {
+    return this.router.url.startsWith(route);
+  }
+
+  getRouteClass(route: string): string {
+    return this.isRouteActive(route) ? 'active' : '';
+  }
+
+  // ==================== DEVELOPMENT HELPERS ====================
+
+  debugNavbar(): void {
+    console.log('🔍 Navbar Debug Info:', {
+      currentUser: this.currentUser,
+      isScrolled: this.isScrolled,
+      mobileMenuOpen: this.mobileMenuOpen,
+      userMenuOpen: this.userMenuOpen,
+      currentRoute: this.router.url,
+      hasLogo: this.hasLogo
+    });
+    
+    this.notificationService.info(
+      'Debug',
+      'Informations de debug affichées dans la console'
+    );
   }
 }
