@@ -1,0 +1,273 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo/Brand -->
+    <div class="navbar-brand">
+      <div class="brand-logo">
+        <img src="/assets/logo.png" alt="EST Béni Mellal" />
+        <div class="brand-fallback">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+      </div>
+      <div class="brand-text">
+        <h1>EST Béni Mellal</h1>
+        <span>Gestion des Stages</span>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="navbar-menu">
+      <!-- Dashboard Link -->
+      <a [routerLink]="getDashboardRoute()" 
+         routerLinkActive="active" 
+         class="nav-item">
+        <i class="bi bi-speedometer2"></i>
+        <span>Tableau de bord</span>
+      </a>
+
+      <!-- Student Navigation -->
+      <div class="nav-group" *ngIf="currentUser?.role === 'ETUDIANT'">
+        <div class="nav-group-header">
+          <span>Étudiant</span>
+        </div>
+        <a routerLink="/student/new-stage" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-plus-circle"></i>
+          <span>Nouvelle demande</span>
+        </a>
+        <a routerLink="/student/stages" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-briefcase"></i>
+          <span>Mes stages</span>
+        </a>
+        <a routerLink="/student/soutenances" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-calendar-check"></i>
+          <span>Mes Soutenances</span>
+        </a>
+        <a routerLink="/student/ma-planification" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-calendar-week"></i>
+          <span>Ma Planification</span>
+        </a>
+      </div>
+
+      <!-- Encadrant Navigation -->
+      <div class="nav-group" *ngIf="currentUser?.role === 'ENCADRANT'">
+        <div class="nav-group-header">
+          <span>Encadrement</span>
+        </div>
+        <a routerLink="/encadrant/planifications" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-calendar-week"></i>
+          <span>Planifications</span>
+        </a>
+        <a routerLink="/encadrant/rapports" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-file-earmark-text"></i>
+          <span>Rapports</span>
+        </a>
+        <a routerLink="/encadrant/soutenances" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-calendar-event"></i>
+          <span>Soutenances</span>
+        </a>
+      </div>
+
+      <!-- Admin Navigation -->
+      <div class="nav-group" *ngIf="currentUser?.role === 'ADMIN'">
+        <div class="nav-group-header">
+          <span>Administration</span>
+        </div>
+        <a routerLink="/admin/encadrants" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-people"></i>
+          <span>Encadrants</span>
+        </a>
+        <a routerLink="/admin/admins" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-shield-check"></i>
+          <span>Administrateurs</span>
+        </a>
+        <a routerLink="/admin/planifications" 
+           routerLinkActive="active" 
+           class="nav-item">
+          <i class="bi bi-calendar-week"></i>
+          <span>Planifications</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="navbar-user">
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <span>{{ getInitials(currentUser) }}</span>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ getFullName(currentUser) }}</span>
+          <span class="user-role">{{ getRoleLabel(currentUser?.role) }}</span>
+        </div>
+        <i class="bi bi-chevron-down dropdown-arrow" [class.rotated]="userMenuOpen"></i>
+      </div>
+
+      <!-- User Dropdown -->
+      <div class="user-dropdown" [class.active]="userMenuOpen">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar">
+            <span>{{ getInitials(currentUser) }}</span>
+          </div>
+          <div class="dropdown-info">
+            <div class="dropdown-name">{{ getFullName(currentUser) }}</div>
+            <div class="dropdown-email">{{ currentUser?.email }}</div>
+          </div>
+        </div>
+        
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item">
+            <i class="bi bi-person"></i>
+            <span>Mon Profil</span>
+          </a>
+          <a href="#" class="dropdown-item">
+            <i class="bi bi-gear"></i>
+            <span>Paramètres</span>
+          </a>
+          <a href="#" class="dropdown-item">
+            <i class="bi bi-bell"></i>
+            <span>Notifications</span>
+          </a>
+          <a href="#" class="dropdown-item">
+            <i class="bi bi-question-circle"></i>
+            <span>Aide & Support</span>
+          </a>
+        </div>
+        
+        <div class="dropdown-footer">
+          <button class="logout-button" (click)="logout($event)">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Se déconnecter</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-toggle" (click)="toggleMobileMenu()" [class.active]="mobileMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen">
+    <div class="mobile-menu-content">
+      <!-- Mobile Navigation Items -->
+      <a [routerLink]="getDashboardRoute()" 
+         routerLinkActive="active" 
+         class="mobile-nav-item"
+         (click)="closeMobileMenu()">
+        <i class="bi bi-speedometer2"></i>
+        <span>Tableau de bord</span>
+      </a>
+
+      <!-- Student Mobile Navigation -->
+      <div class="mobile-nav-group" *ngIf="currentUser?.role === 'ETUDIANT'">
+        <div class="mobile-nav-group-header">Étudiant</div>
+        <a routerLink="/student/new-stage" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-plus-circle"></i>
+          <span>Nouvelle demande</span>
+        </a>
+        <a routerLink="/student/stages" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-briefcase"></i>
+          <span>Mes stages</span>
+        </a>
+        <a routerLink="/student/soutenances" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-calendar-check"></i>
+          <span>Mes Soutenances</span>
+        </a>
+        <a routerLink="/student/ma-planification" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-calendar-week"></i>
+          <span>Ma Planification</span>
+        </a>
+      </div>
+
+      <!-- Encadrant Mobile Navigation -->
+      <div class="mobile-nav-group" *ngIf="currentUser?.role === 'ENCADRANT'">
+        <div class="mobile-nav-group-header">Encadrement</div>
+        <a routerLink="/encadrant/planifications" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-calendar-week"></i>
+          <span>Planifications</span>
+        </a>
+        <a routerLink="/encadrant/rapports" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-file-earmark-text"></i>
+          <span>Rapports</span>
+        </a>
+        <a routerLink="/encadrant/soutenances" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-calendar-event"></i>
+          <span>Soutenances</span>
+        </a>
+      </div>
+
+      <!-- Admin Mobile Navigation -->
+      <div class="mobile-nav-group" *ngIf="currentUser?.role === 'ADMIN'">
+        <div class="mobile-nav-group-header">Administration</div>
+        <a routerLink="/admin/encadrants" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-people"></i>
+          <span>Encadrants</span>
+        </a>
+        <a routerLink="/admin/admins" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-shield-check"></i>
+          <span>Administrateurs</span>
+        </a>
+        <a routerLink="/admin/planifications" 
+           routerLinkActive="active" 
+           class="mobile-nav-item"
+           (click)="closeMobileMenu()">
+          <i class="bi bi-calendar-week"></i>
+          <span>Planifications</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Backdrop -->
+  <div class="mobile-backdrop" 
+       [class.active]="mobileMenuOpen || userMenuOpen" 
+       (click)="closeMenus()"></div>
+</nav>
